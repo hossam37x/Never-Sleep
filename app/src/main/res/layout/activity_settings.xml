@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:padding="5dp"
+    tools:context=".Activities.SettingsActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="General Settings"
+        android:textSize="18dp"
+        android:padding="6dp"
+        android:textColor="@color/colorPrimary"/>
+
+    <Switch
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sound"
+        android:padding="15dp"
+        android:id="@+id/SA_settings_sound_switch"/>
+
+    <Switch
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:text="Vibration"
+        android:id="@+id/SA_settings_vibrate_switch"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete all history data"
+        android:textSize="14dp"
+        android:padding="15dp"
+        android:textColor="#000"
+        android:id="@+id/SA_clear_data_textview"
+        android:clickable="true"/>
+
+</LinearLayout>

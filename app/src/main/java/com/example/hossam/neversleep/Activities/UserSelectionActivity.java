@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class UserSelectionActivity extends AppCompatActivity {
 
@@ -28,6 +29,7 @@ public class UserSelectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_selection);
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -35,7 +37,8 @@ public class UserSelectionActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(UserSelectionActivity.this,NewUserActivity.class);
+                startActivity(intent);
             }
         });
         ApplicationDatabase applicationDatabase = new ApplicationDatabase(this);
@@ -52,7 +55,5 @@ public class UserSelectionActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(userAdapter);
-
-
     }
 }

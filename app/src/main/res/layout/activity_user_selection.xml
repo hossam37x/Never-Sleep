@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20sp"
                 android:background="@android:color/transparent"
-                android:hint="Search..."
+                android:hint="Search... By Name"
                 android:textColorHint="#ecedef"
                 android:textSize="20dp"/>
         </android.support.v7.widget.Toolbar>
@@ -37,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        android:backgroundTint="@color/colorPrimary"
+        app:srcCompat="@drawable/dayra" />
 
 </android.support.design.widget.CoordinatorLayout>

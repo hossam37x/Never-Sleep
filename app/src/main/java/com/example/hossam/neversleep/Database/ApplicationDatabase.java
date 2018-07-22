@@ -86,8 +86,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper
         List<Record> userRecords = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         String selectQuery = "Select * from "+ Record.RecordContract.TABLE_NAME
-                + "where "+ Record.RecordContract.COLUMN_USERID+" = "+user.getId()
-                +" ORDER BY " + User.UserContract.COLUMN_NAME + "ASC";
+                + " where "+ Record.RecordContract.COLUMN_USERID+" = "+user.getId();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if(cursor.moveToFirst())
             do {
@@ -128,4 +127,24 @@ public class ApplicationDatabase extends SQLiteOpenHelper
         db.close();
         return user;
     }
+
+    public void deleteRecords(int userID)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        String deleteQuery = "Delete from "+ Record.RecordContract.TABLE_NAME
+                + " where "+ Record.RecordContract.COLUMN_USERID + " = "+String.valueOf(userID);
+        db.execSQL(deleteQuery, null);
+        db.close();
+    }
+
+    public void deleteUser(int userID)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        deleteRecords(userID);
+        String deleteQuery = "Delete from "+ User.UserContract.TABLE_NAME
+                + " where "+ User.UserContract._ID + " = "+String.valueOf(userID);
+        db.execSQL(deleteQuery, null);
+        db.close();
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.example.hossam.neversleep.Activities;
 
-import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
@@ -23,12 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hossam.neversleep.BluetoothService;
-import com.example.hossam.neversleep.Database.ApplicationDatabase;
 import com.example.hossam.neversleep.Database.Model.User;
+import com.example.hossam.neversleep.HistoryActivity;
 import com.example.hossam.neversleep.R;
 
 import java.io.IOException;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,9 +42,21 @@ public class MainActivity extends AppCompatActivity
     TextView BPM_textview;
     @BindView(R.id.connect_button)
     Button connect_button;
+    @BindView(R.id.nav_history)
+    TextView navHistory;
+    @BindView(R.id.nav_edit_profile)
+    TextView navEditProfile;
+    @BindView(R.id.nav_change_user)
+    TextView navChangeUser;
+    @BindView(R.id.nav_settings)
+    TextView navSettings;
+    @BindView(R.id.nav_help)
+    TextView navHelp;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawer;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mmDevice;
-
+    User currentUser;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -69,16 +79,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
         //endregion
-        User u = (User) getIntent().getExtras().getSerializable(CURRENT_USER);
-        Toast.makeText(this, u.getName()+"\n"+u.getAge(),Toast.LENGTH_LONG ).show();
-
+        currentUser = (User) getIntent().getExtras().getSerializable(CURRENT_USER);
+        Toast.makeText(this, currentUser.getName()+"\n"+ currentUser.getAge(),Toast.LENGTH_LONG ).show();
     }
 
     private void initUI() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
@@ -88,7 +97,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         final Intent intent = new Intent(this,BluetoothService.class);
         startService(intent);
-        final ServiceConnection serviceConnection = new ServiceConnection() {
+        final ServiceConnection serviceConnection = new ServiceConnection()
+        {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mBluetoothService = ((BluetoothService.BluetoothServiceBinder)service).getServiceInstance();
@@ -103,6 +113,53 @@ public class MainActivity extends AppCompatActivity
             }
         };
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+        navHistory.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                drawer.closeDrawer(GravityCompat.START);
+                Intent intent = new Intent(MainActivity.this,HistoryActivity.class);
+                intent.putExtra("user", currentUser);
+                startActivity(intent);
+            }
+        });
+        navEditProfile.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(MainActivity.this,UserSelectionActivity.class);
+                startActivity(intent);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+        navChangeUser.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,UserSelectionActivity.class);
+                startActivity(intent);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+
+        navSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+                intent.putExtra("id", currentUser.getId());
+                startActivity(intent);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+        navHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,UserSelectionActivity.class);
+                startActivity(intent);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
     }
 
     @Override
@@ -139,12 +196,17 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(MenuItem item)
+    {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        Log.i("NAV", "clicked");
         if (id == R.id.nav_history) {
             // Handle the camera action
+        }
+        else if(id == R.id.nav_change_user)
+        {
+
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -159,11 +221,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onConnected() {
-
+        connect_button.setVisibility(View.INVISIBLE);
     }
 
     @Override
-    public void onBluetoothEnableRequest() {
+    public void onBluetoothEnableRequest()
+    {
         Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBluetooth, 0);
     }
