@@ -52,5 +52,7 @@ public class UserSelectionActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(userAdapter);
+
+
     }
 }
