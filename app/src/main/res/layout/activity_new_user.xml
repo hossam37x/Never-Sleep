@@ -1,130 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:background="@android:color/white"
-    android:layout_height="match_parent"
-    tools:context=".Activities.NewUserActivity"
-    android:orientation="vertical">
-<ScrollView
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".Activities.NewUserActivity">
+
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/start_logo_image"/>
 
-        <ImageView
-            android:layout_width="180dp"
-            android:layout_height="100dp"
-            android:src="@drawable/logo"
-            android:layout_gravity="center"
-            android:layout_marginTop="40dp" />
+    <TextView
+        android:id="@+id/creatText"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/start_logo_image"
+        android:layout_centerHorizontal="true"
+        android:text="Create new user"
+        android:textSize="8pt"
+        android:textStyle="bold" />
 
-        <TextView
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/creatText"
+        android:layout_centerHorizontal="true"
+        android:text="Please fill all fields in the form"
+        android:textSize="7pt"
+        android:id="@+id/pleaseFill"/>
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/pleaseFill"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/NUA_first_name_textview"
+        android:background="@drawable/rounded_edittext"
+        android:layout_marginTop="20dp"
+        android:hint="  First Name"
+        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        android:drawableLeft="@drawable/name_icon" />
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/NUA_first_name_textview"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/NUA_last_name_textview"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/rounded_edittext"
+        android:hint="  Last Name"
+        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        android:drawableLeft="@drawable/name_icon"/>
+
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/NUA_last_name_textview"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/ANU_datetime_textview"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/rounded_datedit"
+        android:hint="  Birthday"
+        android:drawableLeft="@drawable/date_icon"
+        android:drawableRight="@drawable/edit_icon"
+        android:clickable="true"
+        android:gravity="center|left"
+        android:textSize="18dp"/>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/ANU_datetime_textview"
+        android:id="@+id/NUA_radiogroup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp">
+
+        <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="30sp"
-            android:text="Create new user"
-            android:layout_gravity="center"
-            android:fontFamily="@font/roboto_bold"
-            android:layout_marginTop="20dp"
-            android:textColor="@android:color/black"/>
-
-        <TextView
+            android:id="@+id/NUA_male_radio"
+            android:text="Male"/>
+        <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="Please fill all fields in the form"
-            android:layout_gravity="center"
-            android:fontFamily="@font/roboto_regular"
-            android:layout_marginTop="5dp"/>
+            android:id="@+id/NUA_female_radio"
+            android:text="Female"/>
+    </RadioGroup>
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="40dp"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            android:hint="First Name"
-            android:background="@drawable/text_edit_round_background"
-            android:layout_gravity="center"
-            android:textSize="18sp"
-            android:padding="5dp"
-            android:drawablePadding="2dp"
-            android:inputType="textCapWords"
+    <Button
+        android:layout_marginTop="20dp"
+        android:id="@+id/NUA_save_button"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/selector_button"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Save"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimary"
+        android:textSize="19dp"
+        android:layout_below="@+id/NUA_radiogroup"/>
 
-            android:id="@+id/NUA_first_name_textview"
-            />
+</RelativeLayout>
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="20dp"
-            android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            android:hint="Last Name"
-            android:background="@drawable/text_edit_round_background"
-            android:layout_gravity="center"
-            android:inputType="textCapWords"
-            android:textSize="18sp"
-            android:padding="10dp"
-            android:drawablePadding="2dp"
-            android:id="@+id/NUA_last_name_textview"
-            />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="20dp"
-            android:hint="Birth Date"
-            android:drawableLeft="@drawable/calendar_icon"
-            android:background="@drawable/date_textview_background"
-            android:layout_gravity="center"
-            android:textSize="18sp"
-            android:padding="5dp"
-            android:drawablePadding="10dp"
-            android:clickable="true"
-            android:id="@+id/ANU_datetime_textview" />
-
-        <RadioGroup
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center"
-            android:id="@+id/NUA_radiogroup"
-            android:layout_marginTop="30dp">
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="40dp"
-                android:id="@+id/NUA_male_radio"
-                android:checked="true"
-                android:text="Male"/>
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/NUA_female_radio"
-                android:text="Female"/>
-        </RadioGroup>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="22sp"
-            android:layout_marginTop="70dp"
-            android:text="Save"
-            android:textColor="@color/colorPrimary"
-            android:textAllCaps="false"
-            android:background="@drawable/selector_button"
-            android:id="@+id/NUA_save_button"
-            />
-
-
-    </LinearLayout>
-</ScrollView>
-
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>
