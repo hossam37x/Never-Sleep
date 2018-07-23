@@ -135,9 +135,8 @@ public class ApplicationDatabase extends SQLiteOpenHelper
     public void deleteRecords(int userID)
     {
         SQLiteDatabase db = getWritableDatabase();
-        String deleteQuery = "Delete from "+ Record.RecordContract.TABLE_NAME
-                + " where "+ Record.RecordContract.COLUMN_USERID + " = "+String.valueOf(userID);
-        db.execSQL(deleteQuery, null);
+        String deleteQuery = "DELETE FROM "+ Record.RecordContract.TABLE_NAME + " WHERE "+ Record.RecordContract.COLUMN_USERID + "='"+String.valueOf(userID) + "'";
+        db.execSQL(deleteQuery);
         db.close();
     }
 
@@ -145,9 +144,8 @@ public class ApplicationDatabase extends SQLiteOpenHelper
     {
         SQLiteDatabase db = getWritableDatabase();
         deleteRecords(userID);
-        String deleteQuery = "Delete from "+ User.UserContract.TABLE_NAME
-                + " where "+ User.UserContract._ID + " = "+String.valueOf(userID);
-        db.execSQL(deleteQuery, null);
+        String deleteQuery = "DELETE FROM "+ User.UserContract.TABLE_NAME + " WHERE "+ User.UserContract._ID + " = '"+String.valueOf(userID) + "'";
+        db.execSQL(deleteQuery);
         db.close();
     }
 
