@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.hossam.neversleep.Database.ApplicationDatabase;
+import com.example.hossam.neversleep.Database.Model.Record;
 import com.example.hossam.neversleep.Database.Model.User;
 import com.example.hossam.neversleep.R;
 
@@ -69,6 +70,10 @@ public class StartActivity extends AppCompatActivity {
                     long id = sharedPreferences.getLong("id", 0);
                     ApplicationDatabase db = new ApplicationDatabase(StartActivity.this);
                     User user = db.getUser(id);
+                    Record record = new Record();
+                    record.setHeart_rate(78);
+                    record.setUser_id(1);
+                    db.insertRecord(record);
                     Intent intent = new Intent(StartActivity.this,MainActivity.class);
                     intent.putExtra(MainActivity.CURRENT_USER, user);
                     startActivity(intent);

@@ -49,7 +49,8 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordVi
         }
         void onBind(Record record)
         {
-
+            datetime.setText(record.getDate());
+            bpm.setText(String.valueOf(record.getHeart_rate()));
         }
     }
 }

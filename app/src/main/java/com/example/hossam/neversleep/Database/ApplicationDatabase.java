@@ -11,8 +11,12 @@ import android.provider.ContactsContract;
 import com.example.hossam.neversleep.Database.Model.Record;
 import com.example.hossam.neversleep.Database.Model.User;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class ApplicationDatabase extends SQLiteOpenHelper
 {
@@ -146,5 +150,26 @@ public class ApplicationDatabase extends SQLiteOpenHelper
         db.execSQL(deleteQuery, null);
         db.close();
     }
+
+    public static String getDateCurrentTimeZone(long timestamp) {
+        try{
+            Calendar calendar = Calendar.getInstance();
+            TimeZone tz = TimeZone.getDefault();
+            calendar.setTimeInMillis(timestamp * 1000);
+            calendar.add(Calendar.MILLISECOND, tz.getOffset(calendar.getTimeInMillis()));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date currenTimeZone = (Date) calendar.getTime();
+            return sdf.format(currenTimeZone);
+        }catch (Exception e) {
+        }
+        return "";
+    }
+
+    public static String getCurrentTimeStamp()
+    {
+        Long TimeStamp = System.currentTimeMillis()/1000;
+        return TimeStamp.toString();
+    }
+
 
 }

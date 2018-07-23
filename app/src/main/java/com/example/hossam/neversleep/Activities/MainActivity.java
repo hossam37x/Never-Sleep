@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
@@ -18,10 +19,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hossam.neversleep.BluetoothService;
+import com.example.hossam.neversleep.Database.ApplicationDatabase;
+import com.example.hossam.neversleep.Database.Model.Record;
 import com.example.hossam.neversleep.Database.Model.User;
 import com.example.hossam.neversleep.HistoryActivity;
 import com.example.hossam.neversleep.R;
@@ -54,6 +58,10 @@ public class MainActivity extends AppCompatActivity
     TextView navHelp;
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
+    @BindView(R.id.nav_bar_imageView)
+    ImageView navBarImageView;
+    @BindView(R.id.nav_bar_user_name)
+    TextView navBarUserName;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mmDevice;
     User currentUser;
@@ -81,12 +89,14 @@ public class MainActivity extends AppCompatActivity
         //endregion
         currentUser = (User) getIntent().getExtras().getSerializable(CURRENT_USER);
         Toast.makeText(this, currentUser.getName()+"\n"+ currentUser.getAge(),Toast.LENGTH_LONG ).show();
+        boolean gen = currentUser.getGender();
+        navBarImageView.setImageResource((gen)?R.drawable.nav_bar_boy:R.drawable.nav_bar_girl);
+        navBarUserName.setText(currentUser.getName());
     }
 
     private void initUI() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -187,9 +197,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -220,8 +228,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConnected() {
+    public void onConnected()
+    {
         connect_button.setVisibility(View.INVISIBLE);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run()
+            {
+                Log.i("MAH", "handler run");
+                Record record = new Record();
+                int bpm = Integer.parseInt(BPM_textview.getText().toString());
+                record.setHeart_rate(bpm);
+                record.setUser_id(currentUser.getId());
+                ApplicationDatabase database = new ApplicationDatabase(MainActivity.this);
+                database.insertRecord(record);
+                handler.postDelayed(this,10000 );
+            }
+        }, 10000);
     }
 
     @Override

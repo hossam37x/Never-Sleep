@@ -13,7 +13,7 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/nav_bar_imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/nav_header_desc"
@@ -31,6 +31,7 @@
         android:textSize="16dp"
         android:layout_weight="1"
         android:layout_gravity="center"
+        android:id="@+id/nav_bar_user_name"
         android:textColor="@color/colorPrimary"/>
 
 </LinearLayout>
