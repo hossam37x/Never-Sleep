@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:background="@android:color/white"
+android:padding="5dp"
+tools:context="com.example.hossam.neversleep.HelpActivity">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp">
+
+        <View
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@drawable/help_circle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="How to measure my heart rate?"
+            android:textStyle="bold"
+            android:textSize="14dp"
+            android:paddingLeft="10dp"
+            android:textColor="#000"
+            android:clickable="true"/>
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Just place the device around your fingerd click connect button in the measure screen then stay still during the measurement."
+        android:textSize="14dp"
+        android:paddingTop="5dp"
+        android:paddingLeft="45dp"
+        android:textColor="#555"
+        android:clickable="true"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp">
+
+        <View
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@drawable/help_circle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="What is the normal heart rate?"
+            android:textStyle="bold"
+            android:textSize="14dp"
+            android:paddingLeft="10dp"
+            android:textColor="#000"
+            android:clickable="true"/>
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="A normal resting heart rate, for adults, ranges from 60 to 100 BPM."
+        android:textSize="14dp"
+        android:paddingTop="5dp"
+        android:paddingLeft="45dp"
+        android:textColor="#555"
+        android:clickable="true"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp">
+
+        <View
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@drawable/help_circle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="What is the sleep heart rate?"
+            android:textStyle="bold"
+            android:textSize="14dp"
+            android:paddingLeft="10dp"
+            android:textColor="#000"
+            android:clickable="true"/>
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="A sleep resting heart rate, for adults, ranges from 40 to 60 BPM."
+        android:textSize="14dp"
+        android:paddingTop="5dp"
+        android:paddingLeft="45dp"
+        android:textColor="#555"
+        android:clickable="true"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp">
+
+        <View
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@drawable/help_circle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="If the heart rate less than 40 BPM or more than 100 BPM, you must visit a doctor."
+            android:textSize="14dp"
+            android:paddingLeft="10dp"
+            android:textColor="#555"
+            android:clickable="true"/>
+    </LinearLayout>
+
+</LinearLayout>
