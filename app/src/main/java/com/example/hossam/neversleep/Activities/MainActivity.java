@@ -18,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity
     ImageView navBarImageView;
     @BindView(R.id.nav_bar_user_name)
     TextView navBarUserName;
+    @BindView(R.id.heart_animate)
+    ImageView heartAnimate;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mmDevice;
     User currentUser;
@@ -171,6 +175,8 @@ public class MainActivity extends AppCompatActivity
                 drawer.closeDrawer(GravityCompat.START);
             }
         });
+
+        heartScaleOutAnimation();
     }
 
     @Override
@@ -254,6 +260,48 @@ public class MainActivity extends AppCompatActivity
     {
         Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBluetooth, 0);
+    }
+
+    public void heartScaleOutAnimation()
+    {
+        ScaleAnimation scaleAnimation = new ScaleAnimation(0.5f, 1f, 0.5f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        scaleAnimation.setDuration(500);
+
+        heartAnimate.startAnimation(scaleAnimation);
+        scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationEnd(Animation animation) {
+                heartScaleInAnimation();
+            }
+
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+
+            public void onAnimationStart(Animation animation) {
+
+            }
+        });
+    }
+
+    public void heartScaleInAnimation()
+    {
+        ScaleAnimation scaleAnimation = new ScaleAnimation(1f, 0.5f, 1f, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        scaleAnimation.setDuration(500);
+
+        heartAnimate.startAnimation(scaleAnimation);
+        scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationEnd(Animation animation) {
+                heartScaleOutAnimation();
+            }
+
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+
+            public void onAnimationStart(Animation animation) {
+
+            }
+        });
     }
 
 }

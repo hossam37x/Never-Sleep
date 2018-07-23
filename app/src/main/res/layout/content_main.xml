@@ -10,18 +10,40 @@
     android:background="@android:color/white"
     tools:showIn="@layout/app_bar_main">
 
-    <ImageView
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:src="@drawable/red_heart"
-        android:layout_weight="4"
-        android:padding="50dp"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/red_heart"
+            android:adjustViewBounds="true"
+            android:alpha="0.25"/>
+
+        <ImageView
+            android:layout_width="135dp"
+            android:layout_height="135dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/red_heart"
+            android:alpha="0.5"/>
+
+        <ImageView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/red_heart"
+            android:id="@+id/heart_animate"/>
+
+    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="35dp"
-        android:text="000"
+        android:text="0"
         android:id="@+id/main_activity_bbm_textview"
         android:gravity="center_horizontal"
         android:layout_weight="6.5"/>
@@ -30,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="28dp"
-        android:text="beats per minute"
+        android:text="BEATS PER MINUTE"
         android:textColor="#C7CCD3"
         android:gravity="center_horizontal"
         android:layout_weight="6.5"/>
@@ -69,6 +91,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="9dp"
             android:fontFamily="@font/roboto_bold"
             android:text="Please "
