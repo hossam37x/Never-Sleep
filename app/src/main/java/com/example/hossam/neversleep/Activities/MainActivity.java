@@ -29,6 +29,7 @@ import com.example.hossam.neversleep.BluetoothService;
 import com.example.hossam.neversleep.Database.ApplicationDatabase;
 import com.example.hossam.neversleep.Database.Model.Record;
 import com.example.hossam.neversleep.Database.Model.User;
+import com.example.hossam.neversleep.EditProfileActivity;
 import com.example.hossam.neversleep.HelpActivity;
 import com.example.hossam.neversleep.HistoryActivity;
 import com.example.hossam.neversleep.R;
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent(MainActivity.this,UserSelectionActivity.class);
+                Intent intent = new Intent(MainActivity.this,EditProfileActivity.class);
                 startActivity(intent);
                 drawer.closeDrawer(GravityCompat.START);
             }
