@@ -106,7 +106,13 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
             }
         });
         firstName_EditText.setText(user.getName().substring(0, user.getName().indexOf(" ")));
-        lastName_EditText.setText(user.getName().substring(user.getName().indexOf(" ")+1,user.getName().length()-1));
+        lastName_EditText.setText(user.getName().substring(user.getName().indexOf(" ")+1,user.getName().length()));
+        if(user.getGender()) {
+            genderImage.setImageDrawable(getResources().getDrawable(R.drawable.boy));
+        } else {
+            genderImage.setImageDrawable(getResources().getDrawable(R.drawable.nav_bar_girl));
+        }
+
         if(user.getGender())
             male_Radio.setChecked(true);
         else

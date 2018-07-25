@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity
         });
         //endregion
         currentUser = (User) getIntent().getExtras().getSerializable(CURRENT_USER);
-        Toast.makeText(this, currentUser.getName()+"\n"+ currentUser.getAge(),Toast.LENGTH_LONG ).show();
+        //Toast.makeText(this, currentUser.getName()+"\n"+ currentUser.getAge(),Toast.LENGTH_LONG ).show();
         boolean gen = currentUser.getGender();
         navBarImageView.setImageResource((gen)?R.drawable.nav_bar_boy:R.drawable.nav_bar_girl);
         navBarUserName.setText(currentUser.getName());
@@ -234,12 +234,14 @@ public class MainActivity extends AppCompatActivity
     public void onRecieveNewBPM(int BPM)
     {
         BPM_textview.setText(String.valueOf(BPM));
+        Log.d("service interface","receive");
     }
 
     @Override
     public void onConnected()
     {
         connect_button.setVisibility(View.INVISIBLE);
+        Log.d("service interface","onconnected");
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
