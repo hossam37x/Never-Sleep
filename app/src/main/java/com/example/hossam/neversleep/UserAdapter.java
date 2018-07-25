@@ -18,7 +18,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     ArrayList<User> Users;
     RecyclerItemClickListener mlistener;
 
-    public UserAdapter(ArrayList<User> users,RecyclerItemClickListener listener)
+    public void setUsers(ArrayList<User> users) {
+        Users = users;
+    }
+
+    public UserAdapter(ArrayList<User> users, RecyclerItemClickListener listener)
     {
         Users = users;
         this.mlistener = listener;

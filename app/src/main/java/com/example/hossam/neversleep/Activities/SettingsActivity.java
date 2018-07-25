@@ -1,10 +1,12 @@
 package com.example.hossam.neversleep.Activities;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -22,6 +24,10 @@ public class SettingsActivity extends AppCompatActivity
     Switch vibrate_switch;
     @BindView(R.id.SA_clear_data_textview)
     TextView clearData;
+
+    public static final String SOUND_SETTING = "sound";
+    public static final String VIBRATION_SETTING = "vibration";
+    SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -47,6 +53,21 @@ public class SettingsActivity extends AppCompatActivity
                 .setMessage("Are you sure you want to clear history?")
                 .setPositiveButton("Yes", alertClickListener)
                 .setNegativeButton("No", alertClickListener);
+        sharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE);
+        soundSwitch.setChecked(sharedPreferences.getBoolean(SOUND_SETTING, true));
+        soundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                sharedPreferences.edit().putBoolean(SOUND_SETTING, isChecked).commit();
+            }
+        });
+        vibrate_switch.setChecked(sharedPreferences.getBoolean(VIBRATION_SETTING, true));
+        vibrate_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                sharedPreferences.edit().putBoolean(VIBRATION_SETTING,isChecked ).commit();
+            }
+        });
         clearData.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -54,5 +75,10 @@ public class SettingsActivity extends AppCompatActivity
                 alertDialog.show();
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 }

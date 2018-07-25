@@ -6,12 +6,11 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".Activities.UserSelectionActivity"
-    android:background="@android:color/white"
     tools:showIn="@layout/activity_user_selection">
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="2dp"
+        android:padding="10dp"
         android:id="@+id/user_recycler_view">
     </android.support.v7.widget.RecyclerView>
 </RelativeLayout>

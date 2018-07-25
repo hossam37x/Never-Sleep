@@ -261,7 +261,8 @@ public class BluetoothService extends Service
                                         gotNewBPM(Integer.valueOf(data.trim()));
                                     }
                                 }
-                                else {
+                                else
+                                    {
                                     readBuffer[readBufferPosition++] = b;
                                 }
                             }

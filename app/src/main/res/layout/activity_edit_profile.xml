@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context="com.example.hossam.neversleep.EditProfileActivity">
 
     <LinearLayout
@@ -34,7 +35,7 @@
             android:id="@+id/last_name_textview"
             android:layout_marginTop="10dp"
             android:background="@drawable/rounded_datedit"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             android:drawableLeft="@drawable/name_icon"/>
 
         <TextView

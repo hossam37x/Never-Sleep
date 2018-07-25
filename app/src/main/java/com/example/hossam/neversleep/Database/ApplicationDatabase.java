@@ -22,7 +22,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper
 {
 
     public static final String DATABASE_NAME = "user_database";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
 
     public ApplicationDatabase(Context context)
@@ -47,10 +47,24 @@ public class ApplicationDatabase extends SQLiteOpenHelper
         contentValues.put(User.UserContract.COLUMN_NAME,user.getName());
         contentValues.put(User.UserContract.COLUMN_AGE,user.getAge());
         contentValues.put(User.UserContract.COLUMN_GENDER,(user.getGender())?1:0);
+        contentValues.put(User.UserContract.COLUMN_BIRTH_DATE, user.getBirthDate().getTimeInMillis()/1000);
         long id = db.insert(User.UserContract.TABLE_NAME, null, contentValues);
         db.close();
         return id;
     }
+
+    public void updateUser(User user)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(User.UserContract.COLUMN_NAME,user.getName());
+        contentValues.put(User.UserContract.COLUMN_AGE,user.getAge());
+        contentValues.put(User.UserContract.COLUMN_GENDER,(user.getGender())?1:0);
+        contentValues.put(User.UserContract.COLUMN_BIRTH_DATE, user.getBirthDate().getTimeInMillis()/1000);
+        db.update(User.UserContract.TABLE_NAME, contentValues,"_id="+user.getId(),null);
+        db.close();
+    }
+
 
     public long insertRecord(Record record)
     {
@@ -77,6 +91,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper
                 user.setName(cursor.getString(1));
                 user.setAge(cursor.getInt(cursor.getColumnIndex(User.UserContract.COLUMN_AGE)));
                 user.setGender(cursor.getInt(cursor.getColumnIndex(User.UserContract.COLUMN_GENDER)));
+                user.setBirthDate(cursor.getInt(4));
                 users.add(user);
             }
             while (cursor.moveToNext());
@@ -99,6 +114,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper
                 userRecord.setUser_id(cursor.getInt(cursor.getColumnIndex(Record.RecordContract.COLUMN_USERID)));
                 userRecord.setHeart_rate(cursor.getInt(cursor.getColumnIndex(Record.RecordContract.COLUMN_HEARTRATE)));
                 userRecord.setDate(cursor.getString(cursor.getColumnIndex(Record.RecordContract.COLUMN_DATE)));
+
                 userRecords.add(userRecord);
             }
             while (cursor.moveToNext());
@@ -112,7 +128,8 @@ public class ApplicationDatabase extends SQLiteOpenHelper
 
     }
 
-    public User getUser(long id) {
+    public User getUser(long id)
+    {
         SQLiteDatabase db = getWritableDatabase();
         String selectQuery = "Select * from "+ User.UserContract.TABLE_NAME
                 +" Where "+ User.UserContract._ID + "="+ String.valueOf(id);
@@ -125,7 +142,8 @@ public class ApplicationDatabase extends SQLiteOpenHelper
                 user.setName(cursor.getString(1));
                 user.setAge(cursor.getInt(cursor.getColumnIndex(User.UserContract.COLUMN_AGE)));
                 user.setGender(cursor.getInt(cursor.getColumnIndex(User.UserContract.COLUMN_GENDER)));
-            }
+                user.setBirthDate(cursor.getInt(4));
+                }
             while (cursor.moveToNext());
         cursor.close();
         db.close();

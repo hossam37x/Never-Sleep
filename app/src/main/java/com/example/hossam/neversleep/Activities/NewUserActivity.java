@@ -23,6 +23,7 @@ import com.example.hossam.neversleep.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,6 +47,7 @@ public class NewUserActivity extends AppCompatActivity
     @BindView(R.id.NUA_save_button)
     Button button;
 
+    Date date;
     Calendar dateOfBirth;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -76,6 +78,13 @@ public class NewUserActivity extends AppCompatActivity
                 }
             }
         });
+        firstName_EditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(firstName_EditText.getText().toString().equalsIgnoreCase(""))
+                    firstName_EditText.setError("Please enter first name");
+            }
+        });
         lastName_EditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -96,7 +105,14 @@ public class NewUserActivity extends AppCompatActivity
                     lastName_EditText.setError(null);
             }
         });
+        lastName_EditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(lastName_EditText.getText().toString().equalsIgnoreCase(""))
+                    lastName_EditText.setError("Please enter first name");
 
+            }
+        });
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -121,10 +137,12 @@ public class NewUserActivity extends AppCompatActivity
         user.setName(name);
         user.setAge(getAge(dateOfBirth));
         user.setGender((male_Radio.isChecked())?User.MALE:User.FEMALE);
+        user.setBirthDate(dateOfBirth);
         ApplicationDatabase database = new ApplicationDatabase(this);
         long id = database.insertUser(user);
         //Toast.makeText(this, "User id = "+ String.valueOf(id),Toast.LENGTH_LONG);
         Intent intent = new Intent(this,MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(MainActivity.CURRENT_USER, database.getUser(id));
         SharedPreferences sharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE);
         sharedPreferences.edit().putLong("id",id).commit();
@@ -161,13 +179,19 @@ public class NewUserActivity extends AppCompatActivity
         return ageInt;
     }
 
-
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
     {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year,month,dayOfMonth);
+        //calendar.set(year,month,dayOfMonth);
+        calendar.set(Calendar.YEAR,year );
+        calendar.set(Calendar.MONTH , month);
+        calendar.set(Calendar.DAY_OF_MONTH,dayOfMonth );
+        calendar.set(Calendar.HOUR,0 );
+        calendar.set(Calendar.MINUTE,0 );
+        calendar.set(Calendar.MILLISECOND, 0);
         this.dateOfBirth = calendar;
+        date = new Date(year,month,dayOfMonth+1,0,0);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/mm/dd");
         simpleDateFormat.format(calendar.getTime());
         textView.setText(String.valueOf(dayOfMonth)+"/"+String.valueOf(month+1)+"/"+String.valueOf(year));

@@ -23,6 +23,7 @@ import com.example.hossam.neversleep.Database.Model.User;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,14 +48,14 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
     ImageView genderImage;
 
     Calendar dateOfBirth;
-
+    User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
         ButterKnife.bind(this);
+        user = (User)this.getIntent().getExtras().getSerializable("user");
 
-        datePickerDialog = new DatePickerDialog(this, this,1980,1,1);
         firstName_EditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -97,7 +98,6 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
                     lastName_EditText.setError(null);
             }
         });
-
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -105,17 +105,44 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
                 datePickerDialog.show();
             }
         });
+        firstName_EditText.setText(user.getName().substring(0, user.getName().indexOf(" ")));
+        lastName_EditText.setText(user.getName().substring(user.getName().indexOf(" ")+1,user.getName().length()-1));
+        if(user.getGender())
+            male_Radio.setChecked(true);
+        else
+            female_Radio.setChecked(true);
+        dateOfBirth = user.getBirthDate();
+        Date date = dateOfBirth.getTime();
+
+        textView.setText(String.valueOf(dateOfBirth.get(Calendar.DAY_OF_MONTH))+"/"+
+                String.valueOf(dateOfBirth.get(Calendar.MONTH)+1)+"/"
+                +String.valueOf(dateOfBirth.get(Calendar.YEAR)));
+
+        datePickerDialog = new DatePickerDialog(this, this,dateOfBirth.get(Calendar.YEAR)
+                ,dateOfBirth.get(Calendar.MONTH)
+                ,dateOfBirth.get(Calendar.DAY_OF_MONTH));
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 save();
             }
         });
+
     }
 
     private void save()
     {
-
+        if(!validate())
+            return;
+        String name = firstName_EditText.getText().toString() +" "+ lastName_EditText.getText().toString();
+        user.setName(name);
+        user.setAge(getAge(dateOfBirth));
+        user.setGender((male_Radio.isChecked())?User.MALE:User.FEMALE);
+        user.setBirthDate(dateOfBirth);
+        ApplicationDatabase database = new ApplicationDatabase(this);
+        database.updateUser(user);
+        finish();
     }
 
     private boolean validate()
@@ -138,7 +165,8 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
 
         int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
 
-        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)){
+        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR))
+        {
             age--;
         }
 
@@ -146,12 +174,17 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
         return ageInt;
     }
 
-
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
     {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year,month,dayOfMonth);
+        //calendar.set(year,month,dayOfMonth);
+        calendar.set(Calendar.YEAR,year );
+        calendar.set(Calendar.MONTH , month);
+        calendar.set(Calendar.DAY_OF_MONTH,dayOfMonth );
+        calendar.set(Calendar.HOUR,0 );
+        calendar.set(Calendar.MINUTE,0 );
+        calendar.set(Calendar.MILLISECOND, 0);
         this.dateOfBirth = calendar;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/mm/dd");
         simpleDateFormat.format(calendar.getTime());

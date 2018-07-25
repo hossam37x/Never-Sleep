@@ -44,7 +44,9 @@ tools:context=".Activities.NewUserActivity">
         android:layout_centerHorizontal="true"
         android:id="@+id/NUA_first_name_textview"
         android:background="@drawable/rounded_edittext"
+        android:inputType="textCapWords"
         android:layout_marginTop="20dp"
+        android:maxLength="12"
         android:hint="  First Name"
         android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
         android:drawableLeft="@drawable/name_icon" />
@@ -52,13 +54,15 @@ tools:context=".Activities.NewUserActivity">
     <EditText
         android:layout_width="300dp"
         android:layout_height="50dp"
+        android:maxLength="20"
         android:layout_below="@+id/NUA_first_name_textview"
         android:layout_centerHorizontal="true"
         android:id="@+id/NUA_last_name_textview"
+        android:inputType="textCapWords"
         android:layout_marginTop="10dp"
         android:background="@drawable/rounded_edittext"
         android:hint="  Last Name"
-        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         android:drawableLeft="@drawable/name_icon"/>
 
     <TextView

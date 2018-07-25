@@ -35,6 +35,7 @@ import com.example.hossam.neversleep.HistoryActivity;
 import com.example.hossam.neversleep.R;
 
 import java.io.IOException;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -106,7 +107,6 @@ public class MainActivity extends AppCompatActivity
         final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 Intent intent = new Intent(MainActivity.this,EditProfileActivity.class);
+                intent.putExtra("user", currentUser);
                 startActivity(intent);
                 drawer.closeDrawer(GravityCompat.START);
             }
