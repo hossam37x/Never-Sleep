@@ -142,13 +142,15 @@ public class NewUserActivity extends AppCompatActivity
         long id = database.insertUser(user);
         //Toast.makeText(this, "User id = "+ String.valueOf(id),Toast.LENGTH_LONG);
         Intent intent = new Intent(this,MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+
         intent.putExtra(MainActivity.CURRENT_USER, database.getUser(id));
         SharedPreferences sharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE);
         sharedPreferences.edit().putLong("id",id).commit();
         if(sharedPreferences.getBoolean("first", true))
             sharedPreferences.edit().putBoolean("first", false).apply();
         startActivity(intent);
+        finish();
     }
 
     private boolean validate()

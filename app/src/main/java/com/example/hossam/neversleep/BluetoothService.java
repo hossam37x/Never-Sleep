@@ -4,8 +4,10 @@ import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -14,13 +16,20 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.example.hossam.neversleep.Activities.MainActivity;
+import com.example.hossam.neversleep.Database.ApplicationDatabase;
+import com.example.hossam.neversleep.Database.Model.Record;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +40,24 @@ public class BluetoothService extends Service
     private IBinder mBinder = new BluetoothServiceBinder();
     private BlutoothServiceListener mListener ;
     private boolean ready = false;
+    private Map<String, BluetoothDevice> devices;
+
+    BluetoothAdapter mBluetoothAdapter;
+    BluetoothSocket mmSocket;
+    BluetoothDevice mmDevice;
+    OutputStream mmOutputStream;
+    InputStream mmInputStream;
+    Thread workerThread;
+    byte[] readBuffer;
+    int readBufferPosition;
+    public boolean stopWorker, connected_flag, visible_flag;
+
+    MediaPlayer alarmPlayer;
+
+    Vibrator v;
+
+    ArrayList<Integer> BPMs;
+
 
     public boolean isReady() {
         return ready;
@@ -63,28 +90,18 @@ public class BluetoothService extends Service
         return mBinder;
     }
 
-
-
-    private Map<String, BluetoothDevice> devices;
-
-    BluetoothAdapter mBluetoothAdapter;
-    BluetoothSocket mmSocket;
-    BluetoothDevice mmDevice;
-    OutputStream mmOutputStream;
-    InputStream mmInputStream;
-    Thread workerThread;
-    byte[] readBuffer;
-    int readBufferPosition;
-    volatile boolean stopWorker, connected_flag, visible_flag;
-
-    MediaPlayer alarmPlayer;
-
-    Vibrator v;
+    @Override
+    public boolean onUnbind(Intent intent) {
+        this.stopSelf();
+        return super.onUnbind(intent);
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-
+        alarmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.demonstrative);
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        BPMs = new ArrayList<>();
     }
 
     @Override
@@ -93,23 +110,68 @@ public class BluetoothService extends Service
         return START_STICKY;
     }
 
+    public void setup()
+    {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(mBluetoothAdapter != null)
+        {
+            if(!mBluetoothAdapter.isEnabled())
+            {
+                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                //TODO send message yo activity
+                //startActivityForResult(enableBluetooth, 0);
+                mListener.onBluetoothEnableRequest();
+                //return;
+            }
+            else
+                pairWithDevice();
+        }
+    }
+
+    public void pairWithDevice()
+    {
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        if(pairedDevices.size() > 0)
+        {
+            for(BluetoothDevice device : pairedDevices)
+            {
+                if(device.getName().equals("NeverBT")) // AT+PSWD? = 1234
+                {
+                    mmDevice = device;
+                    ready = true;
+                    break;
+                }
+            }
+        }
+    }
+
     public void gotNewBPM(int bpm)
     {
+        Log.d(this.getClass().getName(),"new BPM" );
         mListener.onRecieveNewBPM(bpm);
-        if (bpm <= 60) {
-            if (!alarmPlayer.isPlaying()) {
+        BPMs.add(bpm);
+        if (bpm <= 60)
+        {
+            if (!alarmPlayer.isPlaying())
+            {
                 alarmPlayer.start();
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            {
                 v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-            }else{
+            }
+            else
+            {
                 v.vibrate(200);
             }
-
-        } else {
-            if (alarmPlayer.isPlaying()) {
+        }
+        else
+        {
+            if (alarmPlayer.isPlaying())
+            {
                 alarmPlayer.pause();
+                v.cancel();
             }
         }
     }
@@ -134,64 +196,65 @@ public class BluetoothService extends Service
         }
     }
 
-    public void setup()
-    {
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(mBluetoothAdapter != null)
-        {
-            if(!mBluetoothAdapter.isEnabled())
-            {
-                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                //TODO send message yo activity
-                //startActivityForResult(enableBluetooth, 0);
-                mListener.onBluetoothEnableRequest();
-            }
-
-            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-
-            if(pairedDevices.size() > 0)
-            {
-                for(BluetoothDevice device : pairedDevices)
-                {
-                    if(device.getName().equals("NeverBT")) // AT+PSWD? = 1234
-                    {
-                        mmDevice = device;
-                        ready = true;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
     public void on() throws IOException
     {
         if(!connected_flag)
         {
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
             mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
-            mmSocket.connect();
+            ConncetAsyncTask conncetAsyncTask = new ConncetAsyncTask();
+            conncetAsyncTask.execute();
+            /*
             Toast.makeText(BluetoothService.this, "Bluetooth On!", Toast.LENGTH_SHORT).show();
             if(mmSocket.isConnected())
             {
+                Log.d(this.getClass().getName(), "socket is connected");
                 mmOutputStream = mmSocket.getOutputStream();
                 mmInputStream = mmSocket.getInputStream();
                 listen();
                 connected_flag = true;
-            }
+            }*/
         }
     }
 
     public void off() throws IOException
     {
-        if(connected_flag) {
+        Log.d(this.getClass().getName(), "ConnectedFlag = "+String.valueOf(connected_flag));
+        if(connected_flag)
+        {
+            Log.d(this.getClass().getName(), "Off");
             stopWorker = true;
             mmOutputStream.close();
             mmInputStream.close();
             mmSocket.close();
             Toast.makeText(BluetoothService.this, "Bluetooth Off!", Toast.LENGTH_SHORT).show();
             connected_flag = false;
+            calculateRecord();
         }
+
+    }
+
+
+    private void calculateRecord()
+    {
+        Integer[] bpms = new Integer[BPMs.size()];
+        BPMs.toArray(bpms);
+        Integer sum = 0;
+        for(Integer val:bpms)
+        {
+            sum+=val;
+        }
+        Arrays.sort(bpms);
+        int average = sum/bpms.length;
+        int min = bpms[0];
+        int max = bpms[bpms.length-1];
+        Record record = new Record();
+        record.setUser_id(MainActivity.currentUser.getId());
+        record.setAvg_heart_rate(average);
+        record.setMin_heart_rate(min);
+        record.setMax_heart_rate(max);
+        ApplicationDatabase applicationDatabase = new ApplicationDatabase(this);
+        applicationDatabase.insertRecord(record);
     }
 
     public void visible() {
@@ -230,15 +293,18 @@ public class BluetoothService extends Service
     {
         final Handler handler = new Handler();
         final byte delimiter = 10;
-
+        Log.d(this.getClass().getName(), "Listening");
         stopWorker = false;
         readBufferPosition = 0;
         readBuffer = new byte[1024];
         workerThread = new Thread(new Runnable() {
             public void run() {
-                while (!Thread.currentThread().isInterrupted() && !stopWorker) {
+                while (!Thread.currentThread().isInterrupted() && !stopWorker)
+                {
+                    //Log.d(this.getClass().getName(), "while loop started");
+
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(10);
                     } catch (InterruptedException e) {
                     }
 
@@ -259,6 +325,7 @@ public class BluetoothService extends Service
                                     if (isInteger(data.trim()))
                                     {
                                         gotNewBPM(Integer.valueOf(data.trim()));
+                                        //Log.d(this.getClass().getName(), "new bbm arrived");
                                     }
                                 }
                                 else
@@ -275,6 +342,7 @@ public class BluetoothService extends Service
 
 
         });
+        workerThread.start();
     }
 
     public boolean isInteger(String s) {
@@ -300,6 +368,46 @@ public class BluetoothService extends Service
     {
         public void onRecieveNewBPM(int BPM);
         public void onConnected();
+        public void onConnectionStatusUpdate(boolean state);
         public void onBluetoothEnableRequest();
+    }
+
+    class ConncetAsyncTask extends AsyncTask<Void,Void,Void>
+    {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                mmSocket.connect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            //Toast.makeText(BluetoothService.this, "Bluetooth On!", Toast.LENGTH_SHORT).show();
+            if(mmSocket.isConnected())
+            {
+                Toast.makeText(BluetoothService.this, "Bluetooth On!", Toast.LENGTH_SHORT).show();
+                Log.d(this.getClass().getName(), "socket is connected");
+                try {
+                    mmOutputStream = mmSocket.getOutputStream();
+                    mmInputStream = mmSocket.getInputStream();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                listen();
+                connected_flag = true;
+                mListener.onConnectionStatusUpdate(true);
+            }
+            else
+            {
+
+                Toast.makeText(BluetoothService.this, "Failed to connect", Toast.LENGTH_SHORT).show();
+                mListener.onConnectionStatusUpdate(false);
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ tools:context=".Activities.NewUserActivity">
 
 <RelativeLayout
     android:layout_width="match_parent"
+    android:background="@android:color/white"
     android:layout_height="match_parent">
     <ImageView
         android:layout_width="150dp"
@@ -49,7 +50,7 @@ tools:context=".Activities.NewUserActivity">
         android:maxLength="12"
         android:hint="  First Name"
         android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        android:drawableLeft="@drawable/name_icon" />
+        android:drawableLeft="@drawable/ic_action_name" />
 
     <EditText
         android:layout_width="300dp"
@@ -63,7 +64,7 @@ tools:context=".Activities.NewUserActivity">
         android:background="@drawable/rounded_edittext"
         android:hint="  Last Name"
         android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        android:drawableLeft="@drawable/name_icon"/>
+        android:drawableLeft="@drawable/ic_action_name" />
 
     <TextView
         android:layout_width="300dp"
@@ -74,8 +75,8 @@ tools:context=".Activities.NewUserActivity">
         android:layout_marginTop="10dp"
         android:background="@drawable/rounded_datedit"
         android:hint="  Birthday"
-        android:drawableLeft="@drawable/date_icon"
-        android:drawableRight="@drawable/edit_icon"
+        android:drawableLeft="@drawable/ic_action_calendar"
+        android:drawableRight="@drawable/ic_action_edit"
         android:clickable="true"
         android:gravity="center|left"
         android:textSize="18dp"/>
@@ -92,6 +93,7 @@ tools:context=".Activities.NewUserActivity">
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:id="@+id/NUA_male_radio"
             android:text="Male"/>
         <RadioButton

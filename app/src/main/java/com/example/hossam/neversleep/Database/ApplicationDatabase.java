@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.ContactsContract;
 
 import com.example.hossam.neversleep.Database.Model.Record;
 import com.example.hossam.neversleep.Database.Model.User;
@@ -49,7 +48,6 @@ public class ApplicationDatabase extends SQLiteOpenHelper
         contentValues.put(User.UserContract.COLUMN_GENDER,(user.getGender())?1:0);
         contentValues.put(User.UserContract.COLUMN_BIRTH_DATE, user.getBirthDate().getTimeInMillis()/1000);
         long id = db.insert(User.UserContract.TABLE_NAME, null, contentValues);
-        db.close();
         return id;
     }
 
@@ -62,7 +60,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper
         contentValues.put(User.UserContract.COLUMN_GENDER,(user.getGender())?1:0);
         contentValues.put(User.UserContract.COLUMN_BIRTH_DATE, user.getBirthDate().getTimeInMillis()/1000);
         db.update(User.UserContract.TABLE_NAME, contentValues,"_id="+user.getId(),null);
-        db.close();
+
     }
 
 
@@ -71,9 +69,11 @@ public class ApplicationDatabase extends SQLiteOpenHelper
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(Record.RecordContract.COLUMN_USERID, record.getUser_id());
-        contentValues.put(Record.RecordContract.COLUMN_HEARTRATE, record.getHeart_rate());
+        contentValues.put(Record.RecordContract.COLUMN_AVG_HEARTRATE, record.getAvg_heart_rate());
+        contentValues.put(Record.RecordContract.COLUMN_MIN_HEARTRATE,record.getMin_heart_rate());
+        contentValues.put(Record.RecordContract.COLUMN_MAX_HEARTRATE,record.getMax_heart_rate());
         long id = db.insert(Record.RecordContract.TABLE_NAME, null, contentValues);
-        db.close();
+
         return id;
     }
 
@@ -96,7 +96,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper
             }
             while (cursor.moveToNext());
         cursor.close();
-        db.close();
+
         return users;
     }
 
@@ -112,14 +112,15 @@ public class ApplicationDatabase extends SQLiteOpenHelper
                 Record userRecord = new Record();
                 userRecord.setId(cursor.getInt(0));
                 userRecord.setUser_id(cursor.getInt(cursor.getColumnIndex(Record.RecordContract.COLUMN_USERID)));
-                userRecord.setHeart_rate(cursor.getInt(cursor.getColumnIndex(Record.RecordContract.COLUMN_HEARTRATE)));
+                userRecord.setAvg_heart_rate(cursor.getInt(cursor.getColumnIndex(Record.RecordContract.COLUMN_AVG_HEARTRATE)));
+                userRecord.setMin_heart_rate(cursor.getInt(cursor.getColumnIndex(Record.RecordContract.COLUMN_MIN_HEARTRATE)));
+                userRecord.setMax_heart_rate(cursor.getInt(cursor.getColumnIndex(Record.RecordContract.COLUMN_MAX_HEARTRATE)));
                 userRecord.setDate(cursor.getString(cursor.getColumnIndex(Record.RecordContract.COLUMN_DATE)));
-
                 userRecords.add(userRecord);
             }
             while (cursor.moveToNext());
         cursor.close();
-        db.close();
+
         return userRecords;
     }
 
@@ -155,7 +156,15 @@ public class ApplicationDatabase extends SQLiteOpenHelper
         SQLiteDatabase db = getWritableDatabase();
         String deleteQuery = "DELETE FROM "+ Record.RecordContract.TABLE_NAME + " WHERE "+ Record.RecordContract.COLUMN_USERID + "='"+String.valueOf(userID) + "'";
         db.execSQL(deleteQuery);
-        db.close();
+
+    }
+
+    public void deleteRecord(int recordID)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        String deleteQuery = "DELETE FROM "+ Record.RecordContract.TABLE_NAME + " WHERE "+ Record.RecordContract._ID + "='"+String.valueOf(recordID) + "'";
+        db.execSQL(deleteQuery);
+
     }
 
     public void deleteUser(int userID)
@@ -164,7 +173,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper
         deleteRecords(userID);
         String deleteQuery = "DELETE FROM "+ User.UserContract.TABLE_NAME + " WHERE "+ User.UserContract._ID + " = '"+String.valueOf(userID) + "'";
         db.execSQL(deleteQuery);
-        db.close();
+
     }
 
     public static String getDateCurrentTimeZone(long timestamp) {

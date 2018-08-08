@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context="com.example.hossam.neversleep.EditProfileActivity">
+    tools:context="com.example.hossam.neversleep.Activities.EditProfileActivity">
 
     <LinearLayout
         android:orientation="vertical"
@@ -15,28 +15,31 @@
             android:layout_width="150dp"
             android:layout_height="100dp"
             android:src="@drawable/boy"
+
             android:layout_gravity="center"
             android:id="@+id/gender_pic"/>
 
         <EditText
             android:layout_width="300dp"
             android:layout_height="50dp"
+            android:maxLength="12"
             android:id="@+id/first_name_textview"
             android:layout_gravity="center"
             android:background="@drawable/rounded_datedit"
             android:layout_marginTop="20dp"
             android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            android:drawableLeft="@drawable/name_icon" />
+            android:drawableLeft="@drawable/ic_action_name" />
 
         <EditText
             android:layout_width="300dp"
             android:layout_height="50dp"
+            android:maxLength="20"
             android:layout_gravity="center"
             android:id="@+id/last_name_textview"
             android:layout_marginTop="10dp"
             android:background="@drawable/rounded_datedit"
             android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            android:drawableLeft="@drawable/name_icon"/>
+            android:drawableLeft="@drawable/ic_action_name"/>
 
         <TextView
             android:layout_width="300dp"
@@ -45,8 +48,8 @@
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:background="@drawable/rounded_datedit"
-            android:drawableLeft="@drawable/date_icon"
-            android:drawableRight="@drawable/edit_icon"
+            android:drawableLeft="@drawable/ic_action_calendar"
+            android:drawableRight="@drawable/ic_action_edit"
             android:hint="  Birthday"
             android:clickable="true"
             android:gravity="center|left"
@@ -81,6 +84,19 @@
             android:background="@drawable/selector_button"
             android:fontFamily="@font/roboto_bold"
             android:text="Save"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimary"
+            android:textSize="19dp"/>
+
+        <Button
+            android:layout_marginTop="20dp"
+            android:id="@+id/delete_button"
+            android:layout_gravity="center"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_button"
+            android:fontFamily="@font/roboto_bold"
+            android:text="Delete"
             android:textAllCaps="false"
             android:textColor="@color/colorPrimary"
             android:textSize="19dp"/>

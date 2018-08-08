@@ -16,18 +16,32 @@
             android:src="@drawable/logo_1"
             android:layout_centerInParent="true"
             android:id="@+id/start_logo_image"/>
-        <ImageView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_alignBottom="@id/start_logo_image"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="80dp"
-            android:id="@+id/start_sentence_image"
-            android:src="@drawable/text" />
+            android:layout_marginTop="80dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/start_sentence_image"
+                android:text="Start each day with a "/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ff696a"
+                android:textStyle="bold"
+                android:text="Healthy Heart"
+                android:id="@+id/start_heart_sentence"/>
+        </LinearLayout>
 
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+                android:layout_height="wrap_content"
             android:background="@drawable/selector_button"
             android:text="Start"
             android:textAllCaps="false"

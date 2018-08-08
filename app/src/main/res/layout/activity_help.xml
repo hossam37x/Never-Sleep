@@ -7,7 +7,7 @@ android:layout_height="match_parent"
 android:orientation="vertical"
 android:background="@android:color/white"
 android:padding="5dp"
-tools:context="com.example.hossam.neversleep.HelpActivity">
+tools:context="com.example.hossam.neversleep.Activities.HelpActivity">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"

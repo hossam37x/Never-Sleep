@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.hossam.neversleep.Database.Model.User;
@@ -52,13 +53,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     {
         User user;
         private TextView textView;
+        private ImageView imageView;
         public UserViewHolder(View itemView) {
             super(itemView);
             textView = (TextView)itemView.findViewById(R.id.user_recycler_view_text);
+            imageView = (ImageView)itemView.findViewById(R.id.user_recycler_view_image);
         }
         void onBind(User user, final RecyclerItemClickListener listener)
         {
             this.user = user;
+            imageView.setImageResource((user.getGender())?R.drawable.boy:R.drawable.nav_bar_girl);
             textView.setText(user.getName());
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

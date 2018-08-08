@@ -1,13 +1,21 @@
 package com.example.hossam.neversleep.Activities;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Vibrator;
+import android.support.v4.media.MediaMetadataCompat;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -22,20 +30,29 @@ import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// import com.example.hossam.neversleep.BluetoothService;
 import com.example.hossam.neversleep.BluetoothService;
 import com.example.hossam.neversleep.Database.ApplicationDatabase;
 import com.example.hossam.neversleep.Database.Model.Record;
 import com.example.hossam.neversleep.Database.Model.User;
-import com.example.hossam.neversleep.EditProfileActivity;
-import com.example.hossam.neversleep.HelpActivity;
-import com.example.hossam.neversleep.HistoryActivity;
 import com.example.hossam.neversleep.R;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.IOException;
-import java.util.Date;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         ,BluetoothService.BlutoothServiceListener
 {
     public static final String CURRENT_USER = "user";
-
+    //region Bindings
     BluetoothService mBluetoothService;
     @BindView(R.id.main_activity_bbm_textview)
     TextView BPM_textview;
@@ -69,9 +86,43 @@ public class MainActivity extends AppCompatActivity
     TextView navBarUserName;
     @BindView(R.id.heart_animate)
     ImageView heartAnimate;
-    private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothDevice mmDevice;
-    User currentUser;
+    @BindView(R.id.graph)
+    GraphView graphView;
+    @BindView(R.id.text_linear_layout)
+    LinearLayout textLinear;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
+    //endregion
+
+    //region Variables
+    public static User currentUser;
+
+    private Map<String, BluetoothDevice> devices;
+    BluetoothAdapter mBluetoothAdapter;
+    BluetoothSocket mmSocket;
+    BluetoothDevice mmDevice;
+    OutputStream mmOutputStream;
+    InputStream mmInputStream;
+    Thread workerThread;
+    byte[] readBuffer;
+    int readBufferPosition;
+    volatile boolean stopWorker, connected_flag, visible_flag;
+
+    MediaPlayer alarmPlayer;
+
+    Vibrator v;
+
+    ArrayList<Integer> BPMs;
+
+    Queue<Integer> graphBufferQueue;
+
+    Handler graphUpdateHandler;
+    Runnable graphUpdateRunnable;
+    LineGraphSeries<DataPoint> mGraphSeries;
+    double graphLastX = 0;
+    boolean graphHandlerLoopFlag = true;
+    //endregion
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -79,38 +130,18 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initUI();
-        //region listeners
-        connect_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mBluetoothService.isReady())
-                {
-                    try {
-                        mBluetoothService.deviceON();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        //endregion
         currentUser = (User) getIntent().getExtras().getSerializable(CURRENT_USER);
-        //Toast.makeText(this, currentUser.getName()+"\n"+ currentUser.getAge(),Toast.LENGTH_LONG ).show();
         boolean gen = currentUser.getGender();
-        navBarImageView.setImageResource((gen)?R.drawable.nav_bar_boy:R.drawable.nav_bar_girl);
+        //graphView.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
+        //graphView.getGridLabelRenderer().setGridColor(0xff696a);
+        navBarImageView.setImageResource((gen)?R.drawable.boy:R.drawable.nav_bar_girl);
         navBarUserName.setText(currentUser.getName());
-    }
+        alarmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.demonstrative);
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        connected_flag = false;
+        visible_flag = false;
+        BPMs = new ArrayList<>();
 
-    private void initUI() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
         final Intent intent = new Intent(this,BluetoothService.class);
         startService(intent);
         final ServiceConnection serviceConnection = new ServiceConnection()
@@ -129,6 +160,58 @@ public class MainActivity extends AppCompatActivity
             }
         };
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+        IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(bluetoothBroadcastReciever,intentFilter );
+        //setup();
+        graphView.setVisibility(View.INVISIBLE);
+        graphBufferQueue = new LinkedList<>();
+        mGraphSeries = new LineGraphSeries<>();
+        graphView.addSeries(mGraphSeries);
+        graphView.getViewport().setMaxY(200);
+        graphView.getViewport().setMinY(0);
+        graphView.getViewport().setMaxX(1000);
+        graphView.getViewport().setMinX(0);
+        graphUpdateHandler = new Handler();
+        graphUpdateRunnable = new Runnable() {
+            @Override
+            public void run()
+            {
+                if(!graphBufferQueue.isEmpty())
+                {
+                    graphLastX+=.01;
+                    Log.d(MainActivity.class.getName(), "graph update");
+                    final int val = graphBufferQueue.remove();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mGraphSeries.appendData(new DataPoint(graphLastX,val), false, 1000);
+                        }
+                    });
+                }
+                if(graphHandlerLoopFlag)
+                    graphUpdateHandler.postDelayed(this,10 );
+            }
+        };
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
+
+    private void initUI()
+    {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         navHistory.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -181,6 +264,24 @@ public class MainActivity extends AppCompatActivity
         heartScaleOutAnimation();
     }
 
+    private void showProgress(boolean visibilty) {
+        if (visibilty)
+        {
+            progressBar.setVisibility(View.VISIBLE);
+            connect_button.setVisibility(View.INVISIBLE);
+        }
+        else
+        {
+            progressBar.setVisibility(View.INVISIBLE);
+            connect_button.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void deviceON(View view) throws IOException {
+        mBluetoothService.on();
+        showProgress(true);
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -199,7 +300,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -231,32 +333,74 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRecieveNewBPM(int BPM)
+    public void onRecieveNewBPM(final int BPM)
     {
-        BPM_textview.setText(String.valueOf(BPM));
+        Log.d(MainActivity.this.getClass().getName(), "new BPM");
+        if(BPM==0)
+            return;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(MainActivity.this.getClass().getName(), "new BPM");
+                BPM_textview.setText(String.valueOf(BPM));
+            }
+        });
+        BPMs.add(BPM);
+        graphBufferQueue.add(BPM);
         Log.d("service interface","receive");
     }
+
+    /*private void calculateRecord()
+    {
+        Integer[] bpms = new Integer[BPMs.size()];
+        BPMs.toArray(bpms);
+        Integer sum = 0;
+        for(Integer val:bpms)
+        {
+            sum+=val;
+        }
+        Arrays.sort(bpms);
+        int average = sum/bpms.length;
+        int min = bpms[0];
+        int max = bpms[bpms.length-1];
+        Record record = new Record();
+        record.setUser_id(currentUser.getId());
+        record.setAvg_heart_rate(average);
+        record.setMin_heart_rate(min);
+        record.setMax_heart_rate(max);
+        ApplicationDatabase applicationDatabase = new ApplicationDatabase(this);
+        applicationDatabase.insertRecord(record);
+    }*/
 
     @Override
     public void onConnected()
     {
         connect_button.setVisibility(View.INVISIBLE);
         Log.d("service interface","onconnected");
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run()
-            {
-                Log.i("MAH", "handler run");
-                Record record = new Record();
-                int bpm = Integer.parseInt(BPM_textview.getText().toString());
-                record.setHeart_rate(bpm);
-                record.setUser_id(currentUser.getId());
-                ApplicationDatabase database = new ApplicationDatabase(MainActivity.this);
-                database.insertRecord(record);
-                handler.postDelayed(this,10000 );
-            }
-        }, 10000);
+
+
+    }
+
+    @Override
+    public void onConnectionStatusUpdate(boolean state) {
+        if(state)
+        {
+            graphView.setVisibility(View.VISIBLE);
+            graphHandlerLoopFlag = true;
+            graphUpdateHandler.postDelayed(graphUpdateRunnable,10 );
+            textLinear.setVisibility(View.INVISIBLE);
+            showProgress(false);
+            connect_button.setText("Disconncet");
+        }
+        else
+        {
+
+            graphView.setVisibility(View.INVISIBLE);
+            graphHandlerLoopFlag = false;
+            connect_button.setVisibility(View.VISIBLE);
+            connect_button.setText("Connect");
+            showProgress(false);
+        }
     }
 
     @Override
@@ -266,9 +410,44 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(enableBluetooth, 0);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==0)
+        {
+            if(resultCode ==Activity.RESULT_OK)
+            {
+                //Toast.makeText(this, "result OK!",Toast.LENGTH_SHORT ).show();
+            }
+        }
+    }
+
+    final BroadcastReceiver bluetoothBroadcastReciever = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(BluetoothAdapter.ACTION_STATE_CHANGED))
+            {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,BluetoothAdapter.ERROR );
+                switch (state)
+                {
+                    case BluetoothAdapter.STATE_ON:
+                        Toast.makeText(MainActivity.this, "Pair!",Toast.LENGTH_LONG ).show();
+                        mBluetoothService.pairWithDevice();
+                        break;
+                    case BluetoothAdapter.STATE_OFF:
+
+                        break;
+                }
+            }
+        }
+    };
+
     public void heartScaleOutAnimation()
     {
-        ScaleAnimation scaleAnimation = new ScaleAnimation(0.5f, 1f, 0.5f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        ScaleAnimation scaleAnimation = new ScaleAnimation(0.5f
+                , 1f, 0.5f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         scaleAnimation.setDuration(500);
 
         heartAnimate.startAnimation(scaleAnimation);
@@ -308,4 +487,9 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(bluetoothBroadcastReciever);
+    }
 }
